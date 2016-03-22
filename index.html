@@ -8,7 +8,38 @@
 
 <style>
     
-/* CSS style rules go here! */   
+body {
+            margin: 5;
+            padding: 5;
+            background: whitesmoke;
+            font-family: Lato, century-gothic;
+            color: #0D0000;
+        }
+        header {
+            padding: 6px 10%;
+        }
+        h1 {
+            display: inline-block;
+            margin-right: 20px;
+            color: #001323;
+        }
+        h2 {
+            display: inline-block;
+            color: #001323;
+        }
+        #map {
+            width: 80%;
+            height: 540px;
+            margin: 10px auto;
+        }
+        footer {
+            padding: 6px 10%;
+            width: 80%;
+        }
+        p {
+            font-size: 1em;
+            color: #001323;
+        } 
 
 </style>
 </head>
@@ -16,16 +47,28 @@
 <body>
     <h1>MAP 672: Programming for Web Mapping</h1>
     <h2>Web Cartography at the University of Kentucky courtesy of Ryan Kelly</h2>
-    <section>
+<section>
     <img src="images/Turbines.png" alt="map of wind turbines" />
     <h3>Density of Wind Turbines Across the USA</h3>
     <p>This hexabin and heat map examines wind turbines from across the USA</p>
     <p>The map was generated in QGIS in MAP 671 under the supervision of maestro Boyd Shearer</p>
     <ul> 
-        <li>See the map: <a href="#">Depth of the ocean</a></li>
-        <li>Data Source: <a href="https://asterweb.jpl.nasa.gov/gdem.asp">GDEM, NASA's ASTER data from the Jet Propulsion Laboratory</a></li>
+        <li>See the map: <a href="#">Wind Turbines</a></li>
+        <li>Data Source: <a href="http://www.nrel.gov/gis/data_wind.html">NREL, National Renewable Energy Labratory</a></li>
     </ul>
 </section>
+
+    
+    
+<section>
+   <a target = '_blank' href="https://rgdonohue.cartodb.com/viz/7a678fd6-88a7-11e5-8ee8-0e674067d321/public_map"><img src="images/Turbines2.png" alt="Turbines Across USA" /></a>
+    <h3><a target = '_blank' href="https://rskelly29028.cartodb.com/viz/c3a5d404-a0d1-11e5-8236-0e3ff518bd15/map">Wind Turbine Distribution Across the USA</a></h3>
+    <p>The map was built using QGIS in MAP 671</p>
+    <ul>
+        <li>See the map: <a target = '_blank'  href="https://rskelly29028.cartodb.com/viz/c3a5d404-a0d1-11e5-8236-0e3ff518bd15/map">Wind Turbines Across the USA</a></li>
+        <li>Data Source: <a target = '_blank'  href="http://www.nrel.gov/gis/data_wind.html">NREL Data &amp; Wind</a></li>
+    </ul>
+</section>    
     
 </body>
 </html>
