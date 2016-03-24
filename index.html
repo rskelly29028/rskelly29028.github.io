@@ -5,28 +5,38 @@
 <title>MAP672 Portfolio Example</title>
 
 <meta name=‘viewport’ content=‘initial-scale=1,maximum-scale=1,user-scalable=no’ />
-
-<style>
     
-body {
+<style>
+        
+        body {
             margin: 5;
             padding: 5;
-            background: whitesmoke;
-            font-family: Lato, century-gothic;
+            background: silver;
+            font-family: Lato, tahoma;
             color: #0D0000;
         }
-        header {
-            padding: 6px 10%;
+        header { 
+            width: 100%;
+            min-width: 800px;
+            margin: 0 auto;
+            background: steelblue;
+            padding: 15px 0 20px;
         }
-        h1 {
-            display: inline-block;
-            margin-right: 20px;
-            color: #001323;
+        h1 { 
+            font-family: perpetua;
+            color: white; 
+            width: 80%;
+            margin: 0 left;
+            color: white;
         }
-        h2 {
-            display: inline-block;
-            color: #001323;
+        h2 { 
+            font-family: perpetua;
+            color: navy;
+            width: 80%;
+            margin: 0 left;
+            color: navy;
         }
+       
         #map {
             width: 80%;
             height: 540px;
@@ -41,41 +51,48 @@ body {
             color: #001323;
         } 
 
+        
+    
 </style>
 </head>
 
 <body>
-    <h1>MAP 672: Programming for Web Mapping</h1>
-    <h2>Web Cartography at the University of Kentucky courtesy of Ryan Kelly</h2>
-<section>
+    <header>
+    <h1><U>MAP 672: Programming for Web Mapping</U></h1>
+    <h2><I>Web Cartography at the University of Kentucky by Ryan Kelly</I></h2>
+    </header>
+    <br>
+<section> 
     <img src="images/Turbines.png" alt="map of wind turbines" />
-    <h3>Density of Wind Turbines Across the USA</h3>
+    <h3>Density of Wind Turbines Across the USA.</h3>
     <p>This hexabin and heat map examines wind turbines from across the USA</p>
-    <p>The map was generated in QGIS in MAP 671 under the supervision of maestro Boyd Shearer</p>
+    <p><I>The map was generated in QGIS in MAP 671 under the supervision of maestro Boyd Shearer</I></p>
     <ul> 
-        <li>See the map: <a href="#">Wind Turbines</a></li>
+        <li>See the map: <a target= "_blank" href="images/NMP_Lab10_WindTurbines_Final_2.pdf">Wind Turbines</a></li>
         <li>Data Source: <a href="http://www.nrel.gov/gis/data_wind.html">NREL, National Renewable Energy Labratory</a></li>
-    </ul>
+    </ul>   
 </section>
-
-    
-    
+    <br>
+    <hr size = "2" width = "80%" align = "center" color = "black">
+    <br>
 <section>
-   <a target = '_blank' href="https://rskelly29028.cartodb.com/viz/c3a5d404-a0d1-11e5-8236-0e3ff518bd15/map"><img src="images/Turbines2.png" alt="Turbines Across USA" /></a>
-    <h3><a target = '_blank' href="https://rskelly29028.cartodb.com/viz/c3a5d404-a0d1-11e5-8236-0e3ff518bd15/map">Wind Turbine Distribution Across the USA</a></h3>
-    <p>The map was built using QGIS in MAP 671</p>
+    <img src="images/Turbines2.png" alt="Turbines Across USA" />
+    <h3>Wind Turbine Distribution Across the USA</h3>
+    <p><I>This map was built using CartoDB in MAP 671</I></p>
     <ul>
-        <li>See the map: <a target = '_blank'  href="https://rskelly29028.cartodb.com/viz/c3a5d404-a0d1-11e5-8236-0e3ff518bd15/map">Wind Turbines Across the USA</a></li>
+        <li>See the map at CartoDB: <a target = '_blank'  href="https://rskelly29028.cartodb.com/viz/c3a5d404-a0d1-11e5-8236-0e3ff518bd15/map">Wind Turbines Across the USA</a></li>
         <li>Data Source: <a target = '_blank'  href="http://www.nrel.gov/gis/data_wind.html">NREL Data &amp; Wind</a></li>
     </ul>
 </section>  
-    
+    <br>
+    <hr size = "2" width = "80%" align = "center" color = "black">
+    <br>
 <section>
-   <a target = '_blank' href="#"><img src="images/Plants.png" alt="Power Plants of USA" /></a>
-    <h3><a target = '_blank' href="#">Power Plants of USA</a></h3>
-    <p>This map was built with custom JavaScript code drawing upon the Leaflet JavaScript Library in MAP 672</p>
+    <img src="images/Plants.png" alt="Power Plants of the USA" />
+    <h3>Power Plants of the USA</h3>
+    <p><I>This map was built with custom JavaScript code drawing upon the Leaflet JavaScript Library in MAP 672</I></p>
     <ul>
-        <li>See the map: <a target = '_blank'  href="#">Power Plants of USA</a></li>
+        <li>See the map: <a target = '_blank'  href="#">Power Plants of the USA</a></li>
         <li>Data Source: <a target = '_blank'  href="http://www.eia.gov/electricity/data/eia923/">Electric Generation &amp; Plants</a></li>
     </ul>
 </section>
