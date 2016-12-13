@@ -1,0 +1,934 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset=utf-8 />
+    <title>MAP 673 Final Project</title>
+    <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.0.2/dist/leaflet.css" />
+    <link href='https://fonts.googleapis.com/css?family=Work+Sans:400,500,600' rel='stylesheet' type='text/css'>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: whitesmoke;
+            font-family: "Work Sans", sans-serif;
+        }
+        
+        #side-panel {
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 32%;
+            background: navy;
+            border-right: 2px solid navy;
+            overflow-y: scroll;
+        }
+        
+        h1 {
+            padding: 8px 25px 8px 15px;
+            margin: 0;
+            background: red;
+            color: white;
+            font-weight: 500;
+            font-size: 2.5em;
+            text-align: center;
+        }
+        
+        h2 {
+            margin: 0;
+            padding: 8px 25px 8px 15px;
+            color: white;
+            font-weight: 500;
+            font-size: 1.2em;
+            text-align: center;
+        }
+        
+        #side-panel p {
+            margin: 8px 0 4px;
+            padding: 0 25px 0 15px;
+            color: white;
+            text-align: center;
+            font-size: 1em;
+        }
+        
+        #side-panel p:after {
+            content: '';
+            display: block;
+            clear: both;
+        }
+        
+        #side-panel img {
+            float: center;
+            margin: 0 0 15px 15px;
+            border: 1px solid white;
+        }
+        
+        #map {
+            position: absolute;
+            order: bottom;
+            top: 0;
+            bottom: 0;
+            right: 0;
+            width: 68%;
+        }
+        
+        .info {
+            color: white;
+            padding: 6px 8px;
+            font-size: 1em;
+            background: black;
+            border-width: medium;
+            border-color: white;
+            text-align: left;   
+        }
+        
+        .info h3 {
+            color: white;
+            text-align: left;
+            margin: 0;
+        }
+        
+        .legend {
+            padding: 6px 8px;
+            font-size: 1em;
+            color: white;
+            background: black;
+            border-width: thin;
+            border-color: white;
+            text-align: left;
+        }
+        
+        .legend h3 {
+            font-size: 1.1em;
+            font-weight: normal;
+            text-align: center;
+            color: white;
+            margin: 10 0 0px 0;
+        }
+        
+        .legend span {
+            width: 20px;
+            height: 20px;
+            float: left;
+            text-align: left;
+            margin: 0 20px 4px 0;
+        }
+        
+        .legend label {
+            font-size: 1.1em;
+            content: '';
+            text-align: left;
+            display: block;
+            clear: both;
+        }
+        
+        #voting {
+            color: white;
+            background-color: darkslategray;
+        }
+        
+        #ui-controls {
+            position: absolute;
+            margin-left: 33%;
+            margin-top: -3%;
+            background-color: black;
+            z-index: 800;
+        }
+        
+        #ui-controls label {
+            font-size: 1em;
+            color: white;
+            margin-right: 5px;
+        }
+        
+    </style>
+</head>
+
+<body>
+    <div id='map'></div>
+    <div id='side-panel'>
+        <h1>THE CHOICE</h1>
+        <h2>The 2016 US Presidential Election</h2>
+        <p>This map displays voting data by state for the 2016 general election and voting, demographic, income and education data by county.</p>
+        <p><img src="graphics/donald-trump-hillary-clinton-impossible-choice.png" alt="legend"></p>
+        <p>306.....................Electoral Votes.................232</p>
+        <p><img src="graphics/red-blue.png" alt="legend"></p>
+        <p>62,829,410..............Popular Vote...........65,483,780</p>
+        
+        <p>The November 8, 2016 election saw GOP candidate Donald Trump score a stunning upset over Democratic nominee Hillary Clinton to become the 45th President of the United States. This was the fourth election in U.S. history - and the second of the 21st century - to see the candidate who won the Electoral College lose the popular vote. The 2016 election also saw the polarization in American political preferences with the Democratic nominee winning by wide margins in urban counties and the GOP nominee winning by huge margins in rural counties. Demographic data indicate well-defined voting patterns that follow both racial and educational lines. Clinton fared well among minority populations and voters with college degrees, while Trump fared well among white voters and those without college degrees.</p>
+        <p>State data is limited to vote totals, with states won by Hillary Clinton in blue and states won by Donald Trump in red. Scroll over each state to view the popular as well as electoral votes awarded. Check the County box in the upper right corner for county data. Attribute data is available from the dropdown menu in the upper left corner. County data will appear in the box to the right as the user scrolls over each county. Click on a county to view voting data for that county.</p>
+        <h2><u>About This Map</u></h2>
+        <p><i>Map created December 11, 2016, by Ryan Kelly, Professor of Geography, GISP, Bluegrass Community and Technical College, Lexington KY.  The author wishes to extend his gratitude to Rich Donohue and the New Maps Plus Program at the University of Kentucky.</i></p>
+        <h2><u>About the Data</u></h2>
+        <p><i>Data furnished from the 2010 US Census (http://www.census.gov/2010census/) and from David Leip's Presidential Atlas 2016 (http://uselectionatlas.org).  County level voting data unavailable for Alaska. Maine had its electoral votes split 3:1 for Hillary Clinton; the split is not represented on the state map.</i></p>
+    </div>
+    
+    <div id="info">
+        <h3><u>County Information</u></h3>    
+    </div>
+    
+    <div id='ui-controls'>
+        <select id="voting">
+            <option value="VOTE">Voting Data 2016 General Election</option>
+            <option value="MINORITY">% Minority (2010 US Census)</option>
+            <option value="BLACK">% African-American (2010 US Census)</option>
+            <option value="LATINO">% Latino (2010 Census)</option>
+            <option value="INCOME">Income Data (2010 US Census)</option>
+            <option value="EDUCATION">Education Data (2010 US Census)</option>
+            <option value="POVERTY">Poverty Data (2010 US Census)</option>
+        </select>
+    </div>
+    
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/simple-statistics/1.0.1/simple_statistics.min.js'></script>
+    <script src="http://code.jquery.com/jquery-3.1.1.min.js"></script>
+    <script src="https://unpkg.com/leaflet@1.0.2/dist/leaflet.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.5/d3.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/queue-async/1.0.7/queue.min.js"></script>
+    <script>
+        
+        var map = L.map('map', {
+            center: [33.5, -97.5],
+            zoom: 4,
+            minZoom: 2,
+            maxZoom: 12,
+            //maxBounds: L.latLngBounds([85, -179], [10, -30]),
+         });
+        
+        var CartoDB_DarkMatter = 
+            L.tileLayer('http://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="http://cartodb.com/attributions">CartoDB</a>',
+            subdomains: 'abcd',
+            maxZoom: 19
+        
+            }).addTo(map);
+        
+        map.zoomControl.setPosition('topright');
+        
+        var countyLayer, statesLayer, lakesLayer, outlineLayer, dataLayer;
+        
+        var attribute = "VOTE";
+        
+        // Load the map data using queue
+        queue()
+            .defer(d3.json, "US-Counties.json")
+            .defer(d3.json, "us-states.json")
+            .defer(d3.csv, "Election-States.csv")
+            .defer(d3.csv, "Master.csv")
+            .defer(d3.json, "Great-Lakes.json")
+            //.defer(d3.json, "states-outline.json")
+            .await(processData);
+        
+        // create the main function to loop through the counties data and grab the county FIPS code to ensure a match for each county
+        function processData(e, counties, states, statesData, countiesData, lakes, outline) {
+            
+            for (var state in states.features) {
+                
+                var stateFIP = states.features[state].properties.STATEFP;
+                
+                for (var d in statesData) {
+                    if (stateFIP === statesData[d].state_fp) {
+                        states.features[state].properties = statesData[d];
+                        break;
+                    }
+                }
+            }
+            
+            for (var county in counties.features) {
+                
+                var countyFIP = counties.features[county].properties.GEOID;
+                
+                for (var d in countiesData) {
+                    var countiesDataFip = countiesData[d].fips;
+                    // need to slice off last five characters for FIPS code
+                    countiesDataFip = countiesDataFip.slice(-5, countiesDataFip.length);
+                    if (countyFIP === countiesDataFip) {
+                        counties.features[county].properties = countiesData[d];
+                        break;
+                    }
+                }
+            }
+            
+            drawLegend();
+            drawMap(states, counties, lakes, outline);
+            buildUI();
+            drawInfo();
+        }
+
+        // create the main function to draw the map
+        function drawMap(states, counties, lakes, outline) {
+            
+            var value = $('#voting').val(); //value will be set VOTE for the initial load
+            
+            countiesLayer = L.geoJson(counties, {
+                
+                    style: function (feature) { 
+                        return {
+                        color: 'white',   
+                        fillColor: getCountyColor(feature, value),
+                        weight: 0.7, 
+                        fillOpacity: 1,
+                        legend: getLegend(feature, value)
+                    };
+                      
+                },
+               
+                onEachFeature: function (feature, layer) {
+                     
+                    layer.on('mouseover', function(){
+                        
+                        updateInfo(this);
+                 
+                    });
+                    
+                    layer.on('mouseover', function(e){ 
+                        
+                        layer.setStyle({
+                            weight: 3,
+                            color: 'yellow',
+                        });
+                    
+                    });
+                    
+                    layer.on('mouseout', function(e){
+                        
+                        layer.setStyle({
+                            weight: 0.7,
+                            color: 'white',
+                        });
+                    });
+
+                      // build the popup w/voting data on mouse click
+                      var votepopup = '<b>County Name:</b> ' + feature.properties.name  + '<br>' + 
+                                       '<b>State Name:</b> ' + feature.properties.state + '<br>' +
+                                       '<b>Clinton:</b> ' + feature.properties.clinton + '<br>' + 
+                                       '<b>Trump:</b> ' + feature.properties.trump + '<br>' +
+                                       '<b>Johnson:</b> ' + feature.properties.johnson + '<br>' + 
+                                       '<b>Stein:</b> ' + feature.properties.stein + '<br>' + 
+                                       '<b>McMullin:</b> ' + feature.properties.mcmullin + '<br>' +
+                                       '<b>WINNER:</b> ' + feature.properties.winner + '<br>' +
+                                       getStatePicture(feature);
+                          
+                       layer.bindPopup(votepopup, {
+                             sticky: true,
+                       })
+                      
+                }
+                
+        }).addTo(map);
+               
+                statesLayer = L.geoJson(states, {
+                    
+                        style: function (feature) { 
+                            return {
+                            color: 'white', 
+                            fillColor: getStateColor(feature),
+                            weight: 1.5, 
+                            fillOpacity: 1, 
+                    };
+                },
+                    
+                    onEachFeature: function (feature, layer) {
+                
+                    // build the tooltip of voting data by state
+                    var tooltip = '<b>STATE:</b> ' + feature.properties.name  + '<br>' + 
+                                  '<b>Clinton:</b> ' + feature.properties.clinton + '<br>' + 
+                                  '<b>Trump:</b> ' + feature.properties.trump + '<br>' +
+                                  '<b>Electoral Votes:</b> ' + feature.properties.votes + '<br>' +
+                                  '<b>WINNER:</b> ' + feature.properties.winner + '<br>' +
+                                  getStatePicture(feature);
+                        
+                    layer.bindTooltip(tooltip, {
+                        sticky: true,
+                    });
+                    
+                }
+                    
+            }).addTo(map);
+            
+                lakesLayer = L.geoJson(lakes, {
+                    style: function (feature) {
+                        return {
+                            color: 'white', 
+                            fillColor: 'navy',
+                            weight: 0.5,
+                            fillOpacity: 1, 
+                        };
+                    }
+                
+            }).addTo(map);
+         
+                //outlineLayer = L.geoJson(outline, {
+                //    style: function (feature) {
+                //       return {
+                //            color: 'white',
+                //           weight: 1.5,
+                //           fillOpacity: 1, 
+                //        };
+                //    }
+                //
+            //}).addTo(map);
+            
+            var sourcesLayers = {
+                "States": statesLayer,
+                "Counties": countiesLayer,  
+            }
+            
+            // build a tab for the user to select counties or states
+            L.control.layers(null, sourcesLayers, {
+                collapsed: false
+                
+            }).addTo(map);
+            
+        }
+        
+        // build the fuction to obtain red/blue color for Clinton/Trump
+        function getStateColor(feature) {
+            
+            var clinton = Number(feature.properties.clinton);
+            var trump = Number(feature.properties.trump);
+            if (clinton > trump) {
+                return "#0101df";
+            }
+            else if (trump > clinton) {
+                return "#fe2e2e";
+            }
+        }
+        
+        //build the function to generate picture of Clinton/Trump
+        function getStatePicture (feature) {
+            
+            var clinton = Number(feature.properties.clinton);
+            var trump = Number(feature.properties.trump);
+            if (clinton > trump) {
+                return "<img src='./graphics/Hillary_Clinton.jpg' />";
+            }
+            else if (trump > clinton) {
+                return "<img src='./graphics/Donald_Trump.jpg' />";
+            }
+        }
+        
+        //build the main function to populate the legend with the correct data from the UI dropdown
+        function getLegend(feature, value){
+            
+            if (value == "VOTE"){
+                    return buildVoteLegend(feature)           
+            }   else if (value == "BLACK"){
+                    return  buildBlackLegend(feature) 
+            }   else if (value == "LATINO"){
+                    return buildLatinoLegend(feature)
+            }   else if (value == "MINORITY"){
+                    return buildMinorityLegend(feature)
+            }   else if (value == "INCOME"){
+                    return buildIncomeLegend(feature)
+            }   else if (value == "EDUCATION"){
+                    return buildEducationLegend(feature)
+            }   else if (value = "POVERTY"){
+                    return buildPovertyLegend(feature)
+            }
+        }
+        
+        // build the main function to generate county color scheme from UI dropdown list
+        function getCountyColor(feature, value) {
+            
+            var clinton = Number(feature.properties.clinton);
+            var trump = Number(feature.properties.trump);
+            var johnson = Number(feature.properties.johnson);
+            var stein = Number(feature.properties.stein);
+            var mcmullin = Number(feature.properties.mcmullin);
+            var totalvote = Number(feature.properties.totalvote);
+            var genvote = (Number(feature.properties.clinton) + Number(feature.properties.trump));
+            var medianHI = Number(feature.properties.Median_HI);
+            var Under18POV = Number(feature.properties.Under18_POV);
+            var bachelor = Number(feature.properties.bachelor);
+            var masters = Number(feature.properties.master_Phd); 
+            var total_pop = Number(feature.properties.pop_Total);
+            var black = Number(feature.properties.pop_Black);
+            var latino = Number(feature.properties.pop_Latino); 
+            var asian = Number(feature.properties.pop_Asian);
+            var native = Number(feature.properties.pop_Amrind);
+            
+            if (value == "VOTE"){
+                    return getCountyVoteColor(feature)           
+            }   else if (value == "BLACK"){
+                    return  getCountyBlackColor(feature) 
+            }   else if (value == "LATINO"){
+                    return getCountyLatinoColor(feature)
+            }   else if (value == "MINORITY"){
+                    return getCountyMinorityColor(feature)
+            }   else if (value == "INCOME"){
+                    return getCountyIncomeColor(feature)
+            }   else if (value == "EDUCATION"){
+                    return getCountyEducationColor(feature)
+            }   else if (value == "POVERTY"){
+                    return getCountyPovertyColor (feature)
+            }
+                    
+        }
+        
+        // build the function to generate county colors on voting statistics
+        function getCountyVoteColor(feature) {
+            
+            var clinton = Number(feature.properties.clinton);
+            var trump = Number(feature.properties.trump);
+            var genvote = (Number(feature.properties.clinton) + Number(feature.properties.trump));
+            var johnson = Number(feature.properties.johnson);
+            var stein = Number(feature.properties.stein);
+            var mcmullin = Number(feature.properties.mcmullin);
+            var totalvote = Number(feature.properties.totalvote);
+            
+            if (clinton / genvote >= 0.6) {
+                return "#08088A";
+            }
+            else if (clinton / genvote >= 0.55) {
+                return "#0101df";
+            }
+            else if (clinton / genvote >= 0.5) {
+                return "#81BEF7";
+            }
+            else if (clinton / genvote >= 0.45) {
+                return "#f5a9a9";
+            }
+            else if (clinton / genvote >= 0.40) {
+                return "#fe2e2e";
+            }
+            else if (clinton / genvote >= 0.01) {
+                return "#df0101"
+            }
+        }
+        
+        // build the function to generate county colors on income statistics
+        function getCountyIncomeColor(feature) {
+            
+            var medianHI = Number(feature.properties.Median_HI);
+            
+            if (medianHI >= 70000) {
+                return "#004d00";
+            }
+            else if (medianHI>= 50000) {
+                return "#009900";
+            }
+            else if (medianHI >= 40000) {
+                return "#00e600";
+            }
+            else if (medianHI >= 30000) {
+                return "#33ff33";
+            }
+            else  {
+                return "#80ff80";
+            }
+        }
+        
+        // build the function to generate county colors on poverty statistics
+        function getCountyPovertyColor(feature) {
+            
+            var Under18POV = Number(feature.properties.Under18_POV); 
+            var total_pop = Number(feature.properties.pop_Total);
+            
+            if (Under18POV/total_pop >= 0.15) {
+                return "#2f4f4f";
+            }
+            else if (Under18POV/total_pop >= 0.1) {
+                return "#696969";
+            }
+            else if (Under18POV/total_pop >= 0.05)  {
+                return "#c0c0c0";
+            }
+            else if (Under18POV/total_pop >= 0.02) {
+                return "#dcdcdc";
+            }
+            else  {
+                return "#f5f5f5";
+            }
+        }
+        
+        // build the function to generate county colors on education statistics
+        function getCountyEducationColor(feature) {
+            
+            var bachelor = Number(feature.properties.bachelor);
+            var masters = Number(feature.properties.master_Phd); 
+            var total_pop = Number(feature.properties.pop_Total);
+            
+            if ((bachelor+masters)/total_pop >= 0.35) {
+                return "#00004b";
+            }
+            else if ((bachelor+masters)/total_pop >= 0.25) {
+                return "#0000ab";
+            }
+            else if ((bachelor+masters)/total_pop >= 0.15)  {
+                return "#2727ff";
+            }
+            else if ((bachelor+masters)/total_pop >= 0.1) {
+                return "#7575ff";
+            }
+            else  {
+                return "#d0d0ff";
+            }
+        }
+        
+        // build the function to generate county colors on African-American statistics
+        function getCountyBlackColor(feature) {
+            
+            var black = Number(feature.properties.pop_Black); 
+            var total_pop = Number(feature.properties.pop_Total);
+            
+            if (black/total_pop >= 0.75) {
+                return "#4b2600";
+            }
+            else if (black/total_pop >= 0.50) {
+                return "#783e00";
+            }
+            else if (black/total_pop >= 0.1)  {
+                return "#b45e00";
+            }
+            else if (black/total_pop >= 0.01) {
+                return "#ff8600";
+            }
+            else  {
+                return "#ffcf9d";
+            }
+        }
+        
+        // build the function to generate county colors on Latino statistics
+        function getCountyLatinoColor(feature) {
+            
+            var latino = Number(feature.properties.pop_Latino); 
+            var total_pop = Number(feature.properties.pop_Total);
+            
+            if (latino/total_pop >= 0.75) {
+                return "#4d0000";
+            }
+            else if (latino/total_pop >= 0.50) {
+                return "#b30000";
+            }
+            else if (latino/total_pop >= 0.1)  {
+                return "#ff0000";
+            }
+            else if (latino/total_pop >= 0.01) {
+                return "#ff8080";
+            }
+            else  {
+                return "#ffcccc";
+            }
+        }
+        
+        // build the function to generate county colors on minority race statistics
+        function getCountyMinorityColor(feature) {
+            
+            var black = Number(feature.properties.pop_Black);
+            var latino = Number(feature.properties.pop_Latino); 
+            var asian = Number(feature.properties.pop_Asian);
+            var native = Number(feature.properties.pop_Amrind);
+            var total_pop = Number(feature.properties.pop_Total);
+            
+            if ((black + latino + asian + native)/total_pop >= 0.75) {
+                return "#66004d";
+            }
+            else if ((black + latino + asian + native)/total_pop >= 0.50) {
+                return "#cc0099";
+            }
+            else if ((black + latino + asian + native)/total_pop >= 0.1)  {
+                return "#ff33cc";
+            }
+            else if ((black + latino + asian + native)/total_pop >= 0.05) {
+                return "#ff80df";
+            }
+            else  {
+                return "#ffccf2";
+            }
+        }
+        
+        // may be able to eliminate all popup functions of pie charts cannot be built
+        
+        // build the function to determine which popup is to be launched
+        function getPopup(feature, value){
+            
+            if (value == "VOTE"){
+                    return createvotePopup(feature)           
+            }   else if (value == "BLACK"){
+                    return createracePopup(feature) 
+            }   else if (value == "LATINO"){
+                    return createracePopup(feature)
+            }   else if (value == "MINORITY"){
+                    return createracePopup(feature)
+            }   else if (value == "INCOME"){
+                    return createvotePopup(feature)
+            }   else if (value == "EDUCATION"){
+                    return createvotePopup(feature)
+            }   else if (value == "POVERTY"){
+                    return createvotePopup(feature)
+            }
+        }
+        
+        // build the function to create a popup of county-level voting results
+        function createvotePopup(layer, feature){
+           
+            var votepopup = '<b>County Name:</b> ' + feature.properties.name  + '<br>' + 
+                                  '<b>State Name:</b> ' + feature.properties.state + '<br>' +
+                                  '<b>Clinton:</b> ' + feature.properties.clinton + '<br>' + 
+                                  '<b>Trump:</b> ' + feature.properties.trump + '<br>' +
+                                  '<b>Johnson:</b> ' + feature.properties.johnson + '<br>' + 
+                                  '<b>Stein:</b> ' + feature.properties.stein + '<br>' + 
+                                  '<b>McMullin:</b> ' + feature.properties.mcmullin + '<br>' +
+                                  '<b>WINNER:</b> ' + feature.properties.winner + '<br>' +
+                                  getStatePicture(feature);
+                        
+                    layer.bindPopup(votepopup, {
+                        sticky: true,
+                    })
+            
+        }
+
+        // build the function to create a popup of county-level racial statistics
+        function createracePopup(layer, feature){
+            
+            var racepopup = '<b>County Name:</b> ' + feature.properties.name  + '<br>' + 
+                            '<b>State Name:</b> ' + feature.properties.state + '<br>' +
+                            '<b>White:</b> ' + feature.properties.pop_White + '<br>' + 
+                            '<b>African-American:</b> ' + feature.properties.pop_Black + '<br>' +
+                            '<b>Latino:</b> ' + feature.properties.pop_Latino + '<br>' + 
+                            '<b>Asian:</b> ' + feature.properties.pop_Asian + '<br>' + 
+                            '<b>Native American:</b> ' + feature.properties.pop_Amrind + '<br>'; 
+                         
+                     layer.bindPopup(racepopup, {
+                         sticky: true,
+                     })
+            
+        }
+        
+        // end potential deletions of functions
+        
+        // create function to update the map
+        function updateMap(){
+            
+                countiesLayer.eachLayer(function(layer){
+                
+                layer.setStyle({
+                    fillColor: getCountyColor(layer.feature, attribute),
+                    legend: getLegend(layer.feature, attribute)
+                    //popup: getPopup(layer.feature, attribute)
+            });
+               
+        })
+        
+        }
+        
+        // create the function to build the legend box
+        function drawLegend() {
+
+			// create a new Leaflet control object, and position it top left
+			var legend = L.control({
+				position: 'bottomleft'
+			});
+
+			// when the legend is added to the map
+			legend.onAdd = function (map) {
+
+				// create a new HTML <div> element and give it a class name of "legend"
+				var div = L.DomUtil.create('div', 'legend');
+
+				return div;
+
+			};
+
+			// add the legend to the map
+			legend.addTo(map);
+		}
+        
+        // build the function to create voter legend data
+        function buildVoteLegend(feature) {
+            
+            var colorclinton60 = "#08088a";
+            var colorclinton5560 = "#0101df";
+            var colorclinton5055 = "#81bef7";
+            var colortrump5055 = "#f5a9a9";
+            var colortrump5560 = "#fe2e2e";
+            var colortrump60 = "#df0101";
+            
+            var legend = $('.legend').html("<h3>" + "Percent for Each Candidate" + "</h3><ul>" + '<br>' +
+                                           '<span style="background:' + colorclinton60 + '"></span>' + "Clinton > 60%" + '<br>' + '<br>' +
+                                           '<span style="background:' + colorclinton5560 + '"></span>' + "Clinton 55% to 60%" + '<br>' + '<br>' +
+                                           '<span style="background:' + colorclinton5055 + '"></span>' + "Clinton 50% to 55%" + '<br>' + '<br>' +
+                                           '<span style="background:' + colortrump5055 + '"></span>' + "Trump 50% to 55%" + '<br>' + '<br>' +
+                                           '<span style="background:' + colortrump5560 + '"></span>' + "Trump 55% to 60%" + '<br>' + '<br>' +
+                                           '<span style="background:' + colortrump60 + '"></span>' + "Trump > 60%");
+            
+        }
+        
+        // build the function to create minority race legend data
+        function buildMinorityLegend(feature) {
+            
+            var colorminority75 = "#66004d";
+            var colorminority5075 = "#cc0099";
+            var colorminority1050 = "#ff33cc";
+            var colorminority510 = "#ff80df";
+            var colorminority5 = "#ffccf2";
+            
+            
+            var legend = $('.legend').html("<h3>" + "Percent Minority by County" + "</h3><ul>" + '<br>' +
+                                           '<span style="background:' + colorminority75 + '"></span>' + "More than 75% Minority" + '<br>' + '<br>' +
+                                           '<span style="background:' + colorminority5075 + '"></span>' + "50% to 75% Minority" + '<br>' + '<br>' +
+                                           '<span style="background:' + colorminority1050 + '"></span>' + "10% to 50% Minority" + '<br>' + '<br>' +
+                                           '<span style="background:' + colorminority510 + '"></span>' + "5% to 10% Minority" + '<br>' + '<br>' +
+                                           '<span style="background:' + colorminority5 + '"></span>' + "Less than 5% Minority");
+          
+        }
+
+        // build the function to create African-American legend data
+        function buildBlackLegend(feature) {
+
+            var colorblack75 = "#4b2600";
+            var colorblack5075 = "#783e00";
+            var colorblack1050 = "#b45e00";
+            var colorblack110 = "#ff8600";
+            var colorblack1 = "#ffcf9d";
+            
+            
+            var legend = $('.legend').html("<h3>" + "Percent African-American" + "</h3><ul>" + '<br>' +
+                                           '<span style="background:' + colorblack75 + '"></span>' + "More than 75%" + '<br>' + '<br>' +
+                                           '<span style="background:' + colorblack5075 + '"></span>' + "50% to 75%" + '<br>' + '<br>' +
+                                           '<span style="background:' + colorblack1050 + '"></span>' + "10% to 50%" + '<br>' + '<br>' +
+                                           '<span style="background:' + colorblack110 + '"></span>' + "1% to 10%" + '<br>' + '<br>' +
+                                           '<span style="background:' + colorblack1 + '"></span>' + "Less than 1%");
+          
+        }
+        
+        // build the function to create Latino legend data
+        function buildLatinoLegend(feature) {
+
+            var colorlatino75 = "#4d0000";
+            var colorlatino5075 = "#b30000";
+            var colorlatino1050 = "#ff0000";
+            var colorlatino110 = "#ff8080";
+            var colorlatino1 = "#ffcccc";
+            
+            
+            var legend = $('.legend').html("<h3>" + "Percent Latino" + "</h3><ul>" + '<br>' +
+                                           '<span style="background:' + colorlatino75 + '"></span>' + "More than 75%" + '<br>' + '<br>' +
+                                           '<span style="background:' + colorlatino5075 + '"></span>' + "50% to 75%" + '<br>' + '<br>' +
+                                           '<span style="background:' + colorlatino1050 + '"></span>' + "10% to 50%" + '<br>' + '<br>' +
+                                           '<span style="background:' + colorlatino110 + '"></span>' + "1% to 10%" + '<br>' + '<br>' +
+                                           '<span style="background:' + colorlatino1 + '"></span>' + "Less than 1%");
+          
+        }
+        
+        // build the function to create education attainment legend data
+        function buildEducationLegend(feature) {
+            
+            var coloredu35 = "#00004b";
+            var coloredu2535 = "#0000ab";
+            var coloredu1525 = "#2727ff";
+            var coloredu1015 = "#7575ff";
+            var coloredu10 = "#d0d0ff";
+            
+            
+            var legend = $('.legend').html("<h3>" + "Percent with College Degree" + "</h3><ul>" + '<br>' +
+                                           '<span style="background:' + coloredu35 + '"></span>' + "More than 35%" + '<br>' + '<br>' +
+                                           '<span style="background:' + coloredu2535 + '"></span>' + "25% to 35%" + '<br>' + '<br>' +
+                                           '<span style="background:' + coloredu1525 + '"></span>' + "15% to 25%" + '<br>' + '<br>' +
+                                           '<span style="background:' + coloredu1015 + '"></span>' + "10% to 15%" + '<br>' + '<br>' +
+                                           '<span style="background:' + coloredu10 + '"></span>' + "Less than 10%");
+          
+            }
+        
+        // build the function to create income legend data
+        function buildIncomeLegend(feature) {
+            
+            var colorinc70 = "#004d00";
+            var colorinc5070 = "#009900";
+            var colorinc4050 = "#00e600";
+            var colorinc3040 = "#33ff33";
+            var colorinc30 = "#80ff80";
+            
+            var legend = $('.legend').html("<h3>" + "Median Household Income" + "</h3><ul>" + '<br>' +
+                                           '<span style="background:' + colorinc70 + '"></span>' + "Greater than $70,000" + '<br>' + '<br>' +
+                                           '<span style="background:' + colorinc5070 + '"></span>' + "$50,000 to $70,000" + '<br>' + '<br>' +
+                                           '<span style="background:' + colorinc4050 + '"></span>' + "$40,000 to $50,000" + '<br>' + '<br>' +
+                                           '<span style="background:' + colorinc3040 + '"></span>' + "$30,000 to $40,000" + '<br>' + '<br>' +
+                                           '<span style="background:' + colorinc30 + '"></span>' + "Less than $30,000");
+          
+        }
+        
+        
+        // build the function to create poverty legend data
+        function buildPovertyLegend(feature) {
+            
+            var colorpov15 = "#2f4f4f";
+            var colorpov10 = "#696969";
+            var colorpov5 = "#c0c0c0";
+            var colorpov2 = "#dcdcdc";
+            var colorpov1 = "#f5f5f5";
+            
+            var legend = $('.legend').html("<h3>" + "Percent of Children in Poverty" + "</h3><ul>" + '<br>' +
+                                           '<span style="background:' + colorpov15 + '"></span>' + "Greater than 15%" + '<br>' + '<br>' +
+                                           '<span style="background:' + colorpov10 + '"></span>' + "10% to 15%" + '<br>' + '<br>' +
+                                           '<span style="background:' + colorpov5 + '"></span>' + "5% to 10%" + '<br>' + '<br>' +
+                                           '<span style="background:' + colorpov2 + '"></span>' + "2% to 5%" + '<br>' + '<br>' +
+                                           '<span style="background:' + colorpov1 + '"></span>' + "Less than 2%");
+          
+        }
+            // create the main function to build the UI dropdown box
+            function buildUI() {
+                $('select[id="voting"]').change(function () {
+                    attribute = $(this).val();
+                
+                    updateMap();
+                });
+            }
+        
+            // create the main function to build the information window
+            function drawInfo(layer, feature) {
+          
+                var info = L.control({position: 'bottomright'});
+            
+                info.onAdd = function(map) {
+
+                var div = L.DomUtil.create('div', 'info');
+
+                return div;  
+
+            }
+            
+            info.addTo(map);
+            // adds data to information box upon mouseover event
+            countiesLayer.on('mouseover', function() {
+                $(".info").show();
+            });
+            // removes data from information box upon mouseout event
+            countiesLayer.on('mouseout', function() {
+                $(".info").hide();    
+            });
+    
+        }
+              
+            // create the function to update the information box with new data
+            function updateInfo(layer){
+              
+                var props = layer.feature.properties;
+                
+                var html = "<h3>" + props.name +" County</h3>" +
+                           "State: <b>"+ props.state+"</b><br>" +
+                           "Population: <b>"+ props.pop_Total+"</b><br>" +
+                           "% Vote for Clinton: <b>"+ ((props.clinton/props.totalvote)*100).toFixed(2)+"%</b><br>" +
+                           "% Vote for Trump: <b>"+ ((props.trump/props.totalvote)*100).toFixed(2) +"%</b><br>" +
+                           "% White: <b>"+ ((props.pop_White/props.pop_Total)*100).toFixed(2)+"%</b><br>" +
+                           "% African-American: <b>"+ ((props.pop_Black/props.pop_Total)*100).toFixed(2)  +"%</b><br>" +
+                           "% Latino: <b>"+ ((props.pop_Latino/props.pop_Total)*100).toFixed(2)+"%</b><br>" +
+                           "% Asian: <b>"+  ((props.pop_Asian/props.pop_Total)*100).toFixed(2)+"%</b><br>" +
+                           "% Native American: <b>"+ ((props.pop_Amrind/props.pop_Total)*100).toFixed(2)+"%</b><br>" +
+                           "% Male: <b>"+  ((props.pop_Males/props.pop_Total)*100).toFixed(2)+"%</b><br>" +
+                           "% Female: <b>"+ ((props.pop_Females/props.pop_Total)*100).toFixed(2)+"%</b><br>" +
+                           "Per Capita Income: <b>$"+ props.Income+"</b><br>" +
+                           "Median Household Income: <b>$"+ props.Median_HI+"</b><br>" +
+                           "% Under 18 Living in Poverty: <b>"+ ((props.Under18_POV/props.pop_Total)*100).toFixed(2)+"%</b><br>" +
+                           "% with Bachelor Degree: <b>"+ ((props.bachelor/props.pop_Total)*100).toFixed(2)+"%</b><br>" +
+                           "% with Masters or PhD: <b>"+ ((props.master_Phd/props.pop_Total)*100).toFixed(2)+"%</b><br>" 
+                    
+               $(".info").html(html);
+          }
+    
+    </script>
+</body>
+
+</html>
